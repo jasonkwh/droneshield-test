@@ -16,7 +16,7 @@ type subscriber struct {
 	zl     *zap.Logger
 }
 
-func NewSubscriber(psChan string, rcfg config.RedisConfig, ch chan []byte, zl *zap.Logger) (Subscriber, error) {
+func NewSubscriber(rcfg config.RedisConfig, ch chan []byte, zl *zap.Logger) (Subscriber, error) {
 	s := &subscriber{
 		ch: ch,
 		zl: zl,
@@ -31,7 +31,7 @@ func NewSubscriber(psChan string, rcfg config.RedisConfig, ch chan []byte, zl *z
 
 	// subscribe channel
 	s.psConn = redis.PubSubConn{Conn: conn}
-	if err := s.psConn.Subscribe(psChan); err != nil {
+	if err := s.psConn.Subscribe(rcfg.PubSubChannel); err != nil {
 		zl.Error("failed to subscribe redis pubsub", zap.Error(err))
 		return nil, err
 	}
