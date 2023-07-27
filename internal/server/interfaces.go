@@ -1,6 +1,9 @@
 package server
 
+import "io"
+
 type Subscriber interface {
 	Listen() error
-	Close() error
+
+	io.Closer
 }
