@@ -1,2 +1,10 @@
 Server:
   Port: 6823
+
+Redis:
+  PubSubChannel: test_drone_channel
+  Endpoints: localhost:6379
+  Database: 0
+  IdleTimeout: 1m
+  MaxIdleCons: 3
+  MaxActiveCons: 10
