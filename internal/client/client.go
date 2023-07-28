@@ -11,7 +11,7 @@ import (
 )
 
 type client struct {
-	lock       sync.Mutex
+	lock       sync.Mutex // using sync.Mutex lock to avoid race condition
 	rconn      redis.Conn
 	coordinate *model.Coordinate
 	psChan     string
