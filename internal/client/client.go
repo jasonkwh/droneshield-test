@@ -38,6 +38,9 @@ func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
 		return nil, err
 	}
 
+	// simulate the wind effect, just for fun :)
+	go cl.windSimulation()
+
 	// start sending coordinate after drone intialized
 	go cl.sendCoordinate()
 
