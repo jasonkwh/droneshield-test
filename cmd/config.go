@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/jasonkwh/droneshield-test/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -11,9 +12,8 @@ import (
 var cfgFile string
 
 type Config struct {
-	Server struct {
-		Port string
-	}
+	Server config.ServerConfig
+	Redis  config.RedisConfig
 }
 
 func init() {

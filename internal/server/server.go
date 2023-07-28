@@ -4,26 +4,22 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jasonkwh/droneshield-test/internal/config"
 	"go.uber.org/zap"
 	"nhooyr.io/websocket"
 )
 
 type Handler struct {
-	zl *zap.Logger
+	rcfg config.RedisConfig
+	zl   *zap.Logger
 }
 
-func NewServer(zl *zap.Logger) *http.Server {
+// NewServer - creates new server for sending out websocket messages
+func NewServer(scfg config.ServerConfig, rcfg config.RedisConfig, zl *zap.Logger) *http.Server {
 	hdl := &Handler{
 		zl: zl,
 	}
 
-	// start web server
-	// mux := http.NewServeMux()
-	// mux.Handle("/", http.HandlerFunc(hdl.handleSock))
-	// srv := http.Server{
-	// 	Addr:    ":" + scfg.Port,
-	// 	Handler: mux,
-	// }
 	mux := gin.Default()
 	mux.GET("/", hdl.handleSock())
 	srv := http.Server{
@@ -46,5 +42,18 @@ func (h *Handler) handleSock() gin.HandlerFunc {
 			return
 		}
 
+		sp, err := NewSocketPublisher(wsc, h.rcfg, h.zl)
+		if err != nil {
+			wsc.Close(websocket.StatusInternalError, err.Error())
+			return
+		}
+
+		err = sp.PublishLoop()
+		if err != nil {
+			wsc.Close(websocket.StatusInternalError, err.Error())
+			return
+		}
+
+		wsc.Close(websocket.StatusNormalClosure, "")
 	}
 }

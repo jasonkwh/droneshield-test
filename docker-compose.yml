@@ -1,0 +1,16 @@
+version: "3.8"
+
+networks:
+  basic:
+
+services:
+    redis:
+      container_name: redis
+      hostname: redis
+      image: redis:alpine
+      restart: always
+      ports:
+        - 6379:6379
+
+      networks:
+        - basic

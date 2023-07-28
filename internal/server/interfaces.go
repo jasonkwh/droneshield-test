@@ -7,3 +7,10 @@ type Subscriber interface {
 
 	io.Closer
 }
+
+type SocketPublisher interface {
+	PublishLoop() error
+	SendMessage(msg []byte) error
+
+	io.Closer
+}
