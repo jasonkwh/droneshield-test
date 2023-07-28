@@ -5,15 +5,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/jasonkwh/droneshield-test/internal/config"
 	"github.com/jasonkwh/droneshield-test/internal/model"
+	"github.com/jasonkwh/droneshield-test/internal/redis"
 	"go.uber.org/zap"
 )
 
 type client struct {
 	lock        sync.Mutex // using sync.Mutex lock to avoid race condition
-	rconn       redis.Conn
+	rpool       redis.Pool
 	coordinate  *model.Coordinate
 	psChan      string
 	done        chan struct{}
@@ -22,9 +22,9 @@ type client struct {
 	zl *zap.Logger
 }
 
-func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
-	var err error
+func NewClient(rcfg config.RedisConfig, zl *zap.Logger) DroneClient {
 	cl := &client{
+		rpool:       redis.NewRedisPool(rcfg),
 		psChan:      rcfg.PubSubChannel,
 		done:        make(chan struct{}),
 		coordinate:  &model.Coordinate{},
@@ -32,18 +32,12 @@ func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
 		zl:          zl,
 	}
 
-	cl.rconn, err = redis.Dial("tcp", rcfg.Endpoints, redis.DialDatabase(rcfg.Database))
-	if err != nil {
-		zl.Error("failed to initialize redis connection", zap.Error(err))
-		return nil, err
-	}
-
 	// start sending coordinate after drone intialized
 	go cl.sendCoordinate()
 
 	// take off by default
 	cl.Movement(model.MovementTakeOff)
-	return cl, nil
+	return cl
 }
 
 func (cl *client) Movement(move model.Movement) {
@@ -68,6 +62,10 @@ func (cl *client) Movement(move model.Movement) {
 }
 
 func (cl *client) sendCoordinate() {
+	// create redis connection
+	conn := cl.rpool.Get()
+	defer conn.Close()
+
 	t := time.NewTicker(cl.msgInterval)
 
 	for {
@@ -85,7 +83,7 @@ func (cl *client) sendCoordinate() {
 			cl.lock.Unlock()
 
 			cl.zl.Info("sending coordinates", zap.Float64("lat", cl.coordinate.Latitude), zap.Float64("lot", cl.coordinate.Longitude), zap.Float64("alt", cl.coordinate.Altitude))
-			err = cl.rconn.Send("PUBLISH", cl.psChan, bCoor)
+			err = conn.Send("PUBLISH", cl.psChan, bCoor)
 			if err != nil {
 				cl.zl.Error("failed to publish coordinate to redis pubsub", zap.Error(err))
 				continue
@@ -96,7 +94,7 @@ func (cl *client) sendCoordinate() {
 }
 
 func (cl *client) Close() error {
-	if err := cl.rconn.Close(); err != nil {
+	if err := cl.rpool.Close(); err != nil {
 		cl.zl.Error("failed to close redis connection", zap.Error(err))
 		return err
 	}
