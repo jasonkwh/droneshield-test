@@ -1,5 +1,5 @@
 Server:
-  Port: 6823
+  Port: 8080
 
 Redis:
   PubSubChannel: test_drone_channel

@@ -20,7 +20,8 @@ type Handler struct {
 // NewServer - creates new server for sending out websocket messages
 func NewServer(scfg config.ServerConfig, rcfg config.RedisConfig, zl *zap.Logger) *http.Server {
 	hdl := &Handler{
-		zl: zl,
+		rcfg: rcfg,
+		zl:   zl,
 	}
 
 	// default gin mode is DEBUG
@@ -50,7 +51,8 @@ func (h *Handler) handleSock() gin.HandlerFunc {
 		h.zl.Info("received connection")
 
 		wsc, err := websocket.Accept(c.Writer, c.Request, &websocket.AcceptOptions{
-			CompressionMode: websocket.CompressionDisabled,
+			CompressionMode:    websocket.CompressionDisabled,
+			InsecureSkipVerify: true, // enable for testing purposes
 		})
 		if err != nil {
 			c.Writer.WriteHeader(http.StatusInternalServerError)

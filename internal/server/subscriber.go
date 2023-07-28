@@ -52,6 +52,11 @@ func (s *subscriber) Listen() error {
 		case error:
 			return v
 		case redis.Message:
+			//try to unmarshal it
+			// coord := model.Coordinate{}
+			// json.Unmarshal(v.Data, &coord)
+			// s.zl.Info("sending coordinates", zap.Float64("lat", coord.Latitude), zap.Float64("lot", coord.Longitude), zap.Float64("alt", coord.Altitude))
+
 			s.ch <- v.Data
 		case redis.Subscription:
 			s.zl.Debug("redis channel subscription received", zap.Any("channel", v.Channel), zap.Any("kind", v.Kind))

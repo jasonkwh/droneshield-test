@@ -26,7 +26,7 @@ func client(cmd *cobra.Command, args []string) {
 		log.Fatal("unable to start zap logger")
 	}
 
-	cl := droneCl.NewClient(cfg.Redis.PubSubChannel, zl)
+	cl, err := droneCl.NewClient(cfg.Redis, zl)
 	clPool = append(clPool, cl)
 
 	zl.Info("client started")
