@@ -57,7 +57,7 @@ func initConfig() {
 }
 
 func initZapLogger() (*zap.Logger, error) {
-	cfg := zap.NewDevelopmentConfig()
+	cfg := zap.NewProductionConfig()
 
 	// set the internal logger to INFO because we need all internal logs
 	cfg.Level.SetLevel(zapcore.InfoLevel)

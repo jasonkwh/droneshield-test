@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// rootCmd represents the base command
+// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "starts the websocket server",
