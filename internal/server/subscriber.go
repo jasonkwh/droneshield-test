@@ -1,10 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"sync"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/jasonkwh/droneshield-test/internal/config"
+	"github.com/jasonkwh/droneshield-test/internal/model"
 	"go.uber.org/zap"
 )
 
@@ -53,9 +55,9 @@ func (s *subscriber) Listen() error {
 			return v
 		case redis.Message:
 			//try to unmarshal it
-			// coord := model.Coordinate{}
-			// json.Unmarshal(v.Data, &coord)
-			// s.zl.Info("sending coordinates", zap.Float64("lat", coord.Latitude), zap.Float64("lot", coord.Longitude), zap.Float64("alt", coord.Altitude))
+			coord := model.Coordinate{}
+			json.Unmarshal(v.Data, &coord)
+			s.zl.Info("sending coordinates", zap.Float64("lat", coord.Latitude), zap.Float64("lot", coord.Longitude), zap.Float64("alt", coord.Altitude))
 
 			s.ch <- v.Data
 		case redis.Subscription:

@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"sync"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/jasonkwh/droneshield-test/internal/config"
@@ -11,21 +12,24 @@ import (
 )
 
 type client struct {
-	lock       sync.Mutex // using sync.Mutex lock to avoid race condition
-	rconn      redis.Conn
-	coordinate *model.Coordinate
-	psChan     string
-	done       chan struct{}
-	zl         *zap.Logger
+	lock        sync.Mutex // using sync.Mutex lock to avoid race condition
+	rconn       redis.Conn
+	coordinate  *model.Coordinate
+	psChan      string
+	done        chan struct{}
+	msgInterval time.Duration
+
+	zl *zap.Logger
 }
 
 func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
 	var err error
 	cl := &client{
-		psChan:     rcfg.PubSubChannel,
-		done:       make(chan struct{}),
-		zl:         zl,
-		coordinate: &model.Coordinate{},
+		psChan:      rcfg.PubSubChannel,
+		done:        make(chan struct{}),
+		coordinate:  &model.Coordinate{},
+		msgInterval: 1 * time.Second,
+		zl:          zl,
 	}
 
 	cl.rconn, err = redis.Dial("tcp", rcfg.Endpoints, redis.DialDatabase(rcfg.Database))
@@ -64,14 +68,14 @@ func (cl *client) Movement(move model.Movement) {
 }
 
 func (cl *client) sendCoordinate() {
+	t := time.NewTicker(cl.msgInterval)
+
 	for {
 		select {
 		case <-cl.done:
+			t.Stop()
 			return
-		default:
-			/*
-			* TODO: use timeticker, send in each seconds
-			 */
+		case <-t.C:
 			cl.lock.Lock()
 			bCoor, err := json.Marshal(cl.coordinate)
 			if err != nil {

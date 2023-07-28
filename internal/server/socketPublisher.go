@@ -49,6 +49,8 @@ func (sp *socketPublisher) newSubscriber() (Subscriber, error) {
 }
 
 func (sp *socketPublisher) PublishLoop() error {
+	sp.zl.Info("start the publish_loop")
+
 	sub, err := sp.newSubscriber()
 	if err != nil {
 		return err
@@ -56,7 +58,6 @@ func (sp *socketPublisher) PublishLoop() error {
 	defer sub.Close()
 
 	for {
-		sp.zl.Info("start the publish_loop")
 		select {
 		case msg := <-sp.redisPsCh:
 			sp.zl.Info("received redis pubsub message")
