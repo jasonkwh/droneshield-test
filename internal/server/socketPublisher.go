@@ -16,46 +16,20 @@ type socketPublisher struct {
 	zl        *zap.Logger
 }
 
-func NewSocketPublisher(conn *websocket.Conn, rcfg config.RedisConfig, zl *zap.Logger) (SocketPublisher, error) {
+func NewSocketPublisher(conn *websocket.Conn, rcfg config.RedisConfig, redisPsCh chan []byte, done chan struct{}, zl *zap.Logger) (SocketPublisher, error) {
 	sp := &socketPublisher{
-		conn:      conn,
-		rcfg:      rcfg,
-		redisPsCh: make(chan []byte),
-		done:      make(chan struct{}),
-		zl:        zl,
+		conn: conn,
+		rcfg: rcfg,
+		done: done,
+		zl:   zl,
 	}
 
 	go sp.gratefulCloseListener()
 	return sp, nil
 }
 
-func (sp *socketPublisher) newSubscriber() (Subscriber, error) {
-	sub, err := NewSubscriber(sp.rcfg, sp.redisPsCh, sp.zl)
-	if err != nil {
-		return nil, err
-	}
-
-	// listen on redis pubsub
-	go func() {
-		err := sub.Listen()
-		if err != nil {
-			sp.zl.Error("redis pubsub subscriber error", zap.Error(err))
-
-			close(sp.done)
-		}
-	}()
-
-	return sub, nil
-}
-
 func (sp *socketPublisher) PublishLoop() error {
 	sp.zl.Info("start the publish_loop")
-
-	sub, err := sp.newSubscriber()
-	if err != nil {
-		return err
-	}
-	defer sub.Close()
 
 	for {
 		select {
