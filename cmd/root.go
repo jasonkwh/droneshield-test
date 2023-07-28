@@ -2,18 +2,34 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"log"
 
 	"github.com/jasonkwh/droneshield-test/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/multierr"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 // CONFIG
 var cfgFile string
 
+// CONFIG
+var cfg Config
+
 type Config struct {
 	Server config.ServerConfig
 	Redis  config.RedisConfig
+
+	PubSubChannel string
 }
 
 func init() {
@@ -38,4 +54,25 @@ func initConfig() {
 
 	// Put all the config in a common struct
 	viper.Unmarshal(&cfg)
+}
+
+func initZapLogger() (*zap.Logger, error) {
+	cfg := zap.NewDevelopmentConfig()
+
+	// set the internal logger to INFO because we need all internal logs
+	cfg.Level.SetLevel(zapcore.InfoLevel)
+	return cfg.Build()
+}
+
+func gratefulClose(services []io.Closer) error {
+	var errs error
+
+	for _, item := range services {
+		err := item.Close()
+		if err != nil {
+			errs = multierr.Append(errs, err)
+		}
+	}
+
+	return errs
 }
