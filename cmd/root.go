@@ -19,11 +19,13 @@ func Execute() {
 	}
 }
 
-// CONFIG
-var cfgFile string
+var rootCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "starts the websocket server",
+}
 
 // CONFIG
-var cfg Config
+var cfgFile string
 
 type Config struct {
 	Server config.ServerConfig
@@ -34,9 +36,11 @@ type Config struct {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.yaml", "config file")
 }
+
+// CONFIG
+var cfg Config
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {

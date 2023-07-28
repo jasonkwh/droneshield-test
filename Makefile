@@ -1,5 +1,8 @@
 serve:
-	go run . --config=./config/config.yaml
+	go run main.go --config=./config/config.yaml serve
+
+client:
+	go run main.go --config=./config/config.yaml client
 
 redis:
 	docker-compose up -d redis
