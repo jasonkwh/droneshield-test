@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/benbjohnson/clock"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jasonkwh/droneshield-test/internal/config"
 	"github.com/jasonkwh/droneshield-test/internal/model"
@@ -18,17 +19,19 @@ type client struct {
 	psChan      string
 	done        chan struct{}
 	msgInterval time.Duration
+	clock       clock.Clock
 
 	zl *zap.Logger
 }
 
-func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
+func NewClient(rcfg config.RedisConfig, windSimulation bool, zl *zap.Logger) (DroneClient, error) {
 	var err error
 	cl := &client{
 		psChan:      rcfg.PubSubChannel,
 		done:        make(chan struct{}),
 		coordinate:  &model.Coordinate{},
 		msgInterval: 1 * time.Second,
+		clock:       clock.New(),
 		zl:          zl,
 	}
 
@@ -39,10 +42,12 @@ func NewClient(rcfg config.RedisConfig, zl *zap.Logger) (DroneClient, error) {
 	}
 
 	// simulate the wind effect, just for fun :)
-	go cl.windSimulation()
+	if windSimulation {
+		go cl.windSimulation()
+	}
 
 	// start sending coordinate after drone intialized
-	go cl.sendCoordinate()
+	go cl.SendCoordinate()
 
 	// take off by default
 	cl.Movement(model.MovementTakeOff)
@@ -70,8 +75,8 @@ func (cl *client) Movement(move model.Movement) {
 	cl.lock.Unlock()
 }
 
-func (cl *client) sendCoordinate() {
-	t := time.NewTicker(cl.msgInterval)
+func (cl *client) SendCoordinate() {
+	t := cl.clock.Ticker(cl.msgInterval)
 
 	for {
 		select {

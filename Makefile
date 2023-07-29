@@ -11,3 +11,6 @@ test-integration:
 
 redis:
 	docker-compose up -d redis
+
+mocks:
+	mockgen -package mocks -source vendor/github.com/gomodule/redigo/redis/redis.go -destination test/mocks/mock_redis_interfaces.go
