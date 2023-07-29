@@ -31,7 +31,7 @@ type Config struct {
 	Server config.ServerConfig
 	Redis  config.RedisConfig
 
-	PubSubChannel string
+	WindSimulation bool
 }
 
 func init() {

@@ -8,6 +8,7 @@ import (
 
 type DroneClient interface {
 	Movement(model.Movement)
+	SendCoordinate()
 
 	io.Closer
 }

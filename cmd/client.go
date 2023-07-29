@@ -26,7 +26,10 @@ func client(cmd *cobra.Command, args []string) {
 		log.Fatal("unable to start zap logger")
 	}
 
-	cl, err := droneCl.NewClient(cfg.Redis, zl)
+	cl, err := droneCl.NewClient(cfg.Redis, cfg.WindSimulation, zl)
+	if err != nil {
+		zl.Fatal("failed to initialize drone client", zap.Error(err))
+	}
 	clPool = append(clPool, cl)
 
 	zl.Info("client started")
