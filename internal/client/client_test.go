@@ -20,7 +20,7 @@ func Test_DroneClient_SendCoordinate(t *testing.T) {
 	tests := []struct {
 		name           string
 		movements      []model.Movement
-		wantCoordinate *model.Coordinate
+		wantCoordinate model.Coordinate
 	}{
 		{
 			name: "normal send coordinate test",
@@ -29,7 +29,7 @@ func Test_DroneClient_SendCoordinate(t *testing.T) {
 				model.MovementForward,
 				model.MovementRight,
 			},
-			wantCoordinate: &model.Coordinate{
+			wantCoordinate: model.Coordinate{
 				Altitude:  101.0,
 				Latitude:  1.0,
 				Longitude: -1.0,

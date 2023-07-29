@@ -64,6 +64,7 @@ func (h *Handler) handleSock(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			h.zl.Error("redis pubsub subscriber error", zap.Error(err))
 
+			close(redisPsCh)
 			close(done)
 		}
 	}()
