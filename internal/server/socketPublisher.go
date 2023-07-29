@@ -18,10 +18,11 @@ type socketPublisher struct {
 
 func NewSocketPublisher(conn *websocket.Conn, rcfg config.RedisConfig, redisPsCh chan []byte, done chan struct{}, zl *zap.Logger) (SocketPublisher, error) {
 	sp := &socketPublisher{
-		conn: conn,
-		rcfg: rcfg,
-		done: done,
-		zl:   zl,
+		conn:      conn,
+		rcfg:      rcfg,
+		redisPsCh: redisPsCh,
+		done:      done,
+		zl:        zl,
 	}
 
 	go sp.gratefulCloseListener()
