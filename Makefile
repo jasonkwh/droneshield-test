@@ -20,3 +20,4 @@ redis:
 
 mocks:
 	mockgen -package mocks -source vendor/github.com/gomodule/redigo/redis/redis.go -destination test/mocks/mock_redis_interfaces.go
+	mockgen -package mocks -source internal/server/interfaces.go -destination test/mocks/mock_server_interfaces.go

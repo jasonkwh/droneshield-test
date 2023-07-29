@@ -21,12 +21,12 @@ make client
 make serve
 ```
 
-## Unit Test
+## Unit Tests
 ```bash
 # clean test cache
 make test-clean-cache
 
-# execute unit test
+# execute unit tests
 make test-unit
 ```
 
@@ -39,6 +39,6 @@ make test-clean-cache
 make client
 make serve
 
-# execute ingration test
+# execute ingration test + unit tests
 make test-integration
 ```

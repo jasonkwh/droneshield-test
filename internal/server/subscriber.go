@@ -10,10 +10,11 @@ import (
 
 type subscriber struct {
 	lock   sync.Mutex
-	psConn redis.PubSubConn
+	psConn RedisPubSubConn
 	close  bool
 	ch     chan []byte
-	zl     *zap.Logger
+
+	zl *zap.Logger
 }
 
 func NewSubscriber(rcfg config.RedisConfig, ch chan []byte, zl *zap.Logger) (Subscriber, error) {
@@ -30,7 +31,7 @@ func NewSubscriber(rcfg config.RedisConfig, ch chan []byte, zl *zap.Logger) (Sub
 	}
 
 	// subscribe channel
-	s.psConn = redis.PubSubConn{Conn: conn}
+	s.psConn = &redis.PubSubConn{Conn: conn}
 	if err := s.psConn.Subscribe(rcfg.PubSubChannel); err != nil {
 		zl.Error("failed to subscribe redis pubsub", zap.Error(err))
 		return nil, err

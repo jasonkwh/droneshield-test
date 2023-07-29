@@ -43,11 +43,31 @@ func (h *Handler) handleSock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sp, err := NewSocketPublisher(wsc, h.rcfg, h.zl)
+	redisPsCh := make(chan []byte)
+	done := make(chan struct{})
+	sp, err := NewSocketPublisher(wsc, h.rcfg, redisPsCh, done, h.zl)
 	if err != nil {
 		wsc.Close(websocket.StatusInternalError, err.Error())
 		return
 	}
+
+	sub, err := NewSubscriber(h.rcfg, redisPsCh, h.zl)
+	if err != nil {
+		wsc.Close(websocket.StatusInternalError, err.Error())
+		return
+	}
+	defer sub.Close()
+
+	// listen on redis pubsub
+	go func() {
+		err := sub.Listen()
+		if err != nil {
+			h.zl.Error("redis pubsub subscriber error", zap.Error(err))
+
+			close(redisPsCh)
+			close(done)
+		}
+	}()
 
 	err = sp.PublishLoop()
 	if err != nil {
