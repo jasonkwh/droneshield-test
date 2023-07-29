@@ -39,6 +39,6 @@ make test-clean-cache
 make client
 make serve
 
-# execute ingration test + unit tests
+# execute ingration test
 make test-integration
 ```
