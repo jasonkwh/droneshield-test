@@ -18,11 +18,10 @@ make client
 
 ## To start the server
 ```bash
-make server
+make serve
 ```
 
-## Testing the microservices...
-- Unit test
+## Unit Test
 ```bash
 # clean test cache
 make test-clean-cache
@@ -31,10 +30,14 @@ make test-clean-cache
 make test-unit
 ```
 
-- Integration test
+## Integration Test
 ```bash
 # clean test cache
 make test-clean-cache
+
+## start the client & server
+make client
+make serve
 
 # execute ingration test
 make test-integration
