@@ -1,19 +1,24 @@
 package model
 
 type Coordinate struct {
-	Latitude  float64
-	Longitude float64
-	Altitude  float64
+	Latitude  float32
+	Longitude float32
+	Altitude  float32
 }
 
-type Movement int64
+type Movement int32
 
 const (
-	MovementTakeOff = iota
+	MovementUnknown = iota
+	MovementTakeOff
 	MovementUp
 	MovementDown
 	MovementRight
 	MovementLeft
 	MovementForward
 	MovementBackward
+	MovementFigure8
+	MovementCircle
+	MovementZigzag
+	MovementLanding
 )

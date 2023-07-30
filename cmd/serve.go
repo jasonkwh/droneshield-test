@@ -43,7 +43,7 @@ func serve(cmd *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt)
 	<-c
 
-	if err := gratefulClose(clPool); err != nil {
+	if err := gracefulClose(clPool); err != nil {
 		zl.Error("failed to close the server", zap.Error(err))
 	}
 	os.Exit(0)

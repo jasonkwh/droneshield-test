@@ -31,7 +31,10 @@ type Config struct {
 	Server config.ServerConfig
 	Redis  config.RedisConfig
 
-	WindSimulation bool
+	Client struct {
+		WindSimulation bool
+		MovementServer config.ServerConfig
+	}
 }
 
 func init() {
@@ -68,7 +71,7 @@ func initZapLogger() (*zap.Logger, error) {
 	return cfg.Build()
 }
 
-func gratefulClose(services []io.Closer) error {
+func gracefulClose(services []io.Closer) error {
 	var errs error
 
 	for _, item := range services {

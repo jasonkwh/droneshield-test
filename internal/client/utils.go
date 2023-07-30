@@ -16,25 +16,29 @@ func (cl *client) windSimulation() {
 			return
 		case <-t.C:
 			cl.lock.Lock()
-			longRand := randomBool()
-			latRand := randomBool()
-			if longRand {
-				cl.coordinate.Longitude = cl.coordinate.Longitude + randomFloats(0.001, 0.005)
-			} else {
-				cl.coordinate.Longitude = cl.coordinate.Longitude - randomFloats(0.001, 0.005)
+
+			if cl.takeOff {
+				longRand := randomBool()
+				latRand := randomBool()
+				if longRand {
+					cl.coordinate.Longitude = cl.coordinate.Longitude + randomFloats(0.001, 0.005)
+				} else {
+					cl.coordinate.Longitude = cl.coordinate.Longitude - randomFloats(0.001, 0.005)
+				}
+				if latRand {
+					cl.coordinate.Latitude = cl.coordinate.Latitude + randomFloats(0.001, 0.005)
+				} else {
+					cl.coordinate.Latitude = cl.coordinate.Latitude - randomFloats(0.001, 0.005)
+				}
 			}
-			if latRand {
-				cl.coordinate.Latitude = cl.coordinate.Latitude + randomFloats(0.001, 0.005)
-			} else {
-				cl.coordinate.Latitude = cl.coordinate.Latitude - randomFloats(0.001, 0.005)
-			}
+
 			cl.lock.Unlock()
 		}
 	}
 }
 
-func randomFloats(min, max float64) float64 {
-	return rand.Float64() * (max - min)
+func randomFloats(min, max float32) float32 {
+	return rand.Float32() * (max - min)
 }
 
 func randomBool() bool {
