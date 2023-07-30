@@ -35,6 +35,11 @@ type Config struct {
 		WindSimulation bool
 		MovementServer config.ServerConfig
 	}
+
+	Ballast struct {
+		Enabled bool
+		Size    string
+	}
 }
 
 func init() {
