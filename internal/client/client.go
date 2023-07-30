@@ -20,7 +20,7 @@ import (
 )
 
 type client struct {
-	lock        sync.Mutex // using sync.Mutex lock to avoid race condition
+	lock        sync.RWMutex // using sync.Mutex lock to avoid race condition
 	rconn       redis.Conn
 	coordinate  model.Coordinate
 	takeOff     bool
@@ -83,9 +83,9 @@ func NewClient(rcfg config.RedisConfig, scfg config.ServerConfig, windSimulation
 func (cl *client) GetCoordinate(ctx context.Context, r *dronev1.GetCoordinateRequest) (*dronev1.GetCoordinateResponse, error) {
 	cl.zl.Info("received GetCoordinate() call")
 
-	cl.lock.Lock()
+	cl.lock.RLock()
 	coord := cl.coordinate
-	cl.lock.Unlock()
+	cl.lock.RUnlock()
 
 	return &dronev1.GetCoordinateResponse{
 		Coordinate: &dronev1.Coordinate{
