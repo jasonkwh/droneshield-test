@@ -60,7 +60,7 @@ func Test_DroneClient_SendCoordinate(t *testing.T) {
 			tm.mockRedisConn.EXPECT().Close().Return(nil)
 
 			// start sending coordinate after drone intialized
-			go cl.SendCoordinate()
+			go cl.sendCoordinate()
 
 			// advance the clock to tick
 			runtime.Gosched()

@@ -74,7 +74,7 @@ func NewClient(rcfg config.RedisConfig, scfg config.ServerConfig, windSimulation
 	}
 
 	// start sending coordinate after drone intialized
-	go cl.SendCoordinate()
+	go cl.sendCoordinate()
 
 	cl.zl.Info("drone client server is running")
 	return cl, nil
@@ -172,7 +172,7 @@ func (cl *client) setMovement(move model.Movement) {
 	cl.lock.Unlock()
 }
 
-func (cl *client) SendCoordinate() {
+func (cl *client) sendCoordinate() {
 	t := cl.clock.Ticker(cl.msgInterval)
 
 	for {
