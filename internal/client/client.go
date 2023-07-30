@@ -81,12 +81,13 @@ func NewClient(rcfg config.RedisConfig, scfg config.ServerConfig, windSimulation
 }
 
 func (cl *client) Movement(ctx context.Context, r *dronev1.MovementRequest) (*dronev1.MovementResponse, error) {
+	cl.zl.Info("received Movement() call")
+
 	// set drone movement
 	cl.setMovement(mapMovement(r.Movement))
 
-	coord := model.Coordinate{}
 	cl.lock.Lock()
-	coord = cl.coordinate
+	coord := cl.coordinate
 	cl.lock.Unlock()
 
 	return &dronev1.MovementResponse{
@@ -100,7 +101,7 @@ func (cl *client) Movement(ctx context.Context, r *dronev1.MovementRequest) (*dr
 }
 
 func (cl *client) setMovement(move model.Movement) {
-	cl.zl.Info("received movement")
+	cl.zl.Info("setting movement")
 
 	cl.lock.Lock()
 	switch move {
