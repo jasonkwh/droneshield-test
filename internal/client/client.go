@@ -182,19 +182,21 @@ func (cl *client) sendCoordinate() {
 			return
 		case <-t.C:
 			cl.lock.Lock()
-			bCoor, err := json.Marshal(cl.coordinate)
-			if err != nil {
-				cl.zl.Error("failed to marshal coordinate into json", zap.Error(err))
-				continue
+			if cl.takeOff {
+				bCoor, err := json.Marshal(cl.coordinate)
+				if err != nil {
+					cl.zl.Error("failed to marshal coordinate into json", zap.Error(err))
+					continue
+				}
+
+				cl.zl.Info("sending coordinates", zap.Float32("lat", cl.coordinate.Latitude), zap.Float32("lot", cl.coordinate.Longitude), zap.Float32("alt", cl.coordinate.Altitude))
+				err = cl.rconn.Send("PUBLISH", cl.psChan, bCoor)
+				if err != nil {
+					cl.zl.Error("failed to publish coordinate to redis pubsub", zap.Error(err))
+					continue
+				}
 			}
 			cl.lock.Unlock()
-
-			cl.zl.Info("sending coordinates", zap.Float32("lat", cl.coordinate.Latitude), zap.Float32("lot", cl.coordinate.Longitude), zap.Float32("alt", cl.coordinate.Altitude))
-			err = cl.rconn.Send("PUBLISH", cl.psChan, bCoor)
-			if err != nil {
-				cl.zl.Error("failed to publish coordinate to redis pubsub", zap.Error(err))
-				continue
-			}
 		}
 
 	}
