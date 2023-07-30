@@ -1,0 +1,53 @@
+name: CI
+env:
+  GOPRIVATE: "github.com/jasonkwh/*"
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  build_and_test:
+    name: build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.20
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.6
+          check-latest: true
+        id: go
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: start redis
+        run: make redis
+
+      - name: sleep
+        run: sleep 5
+
+      - name: vet
+        run: go vet ./..
+
+      - name: execute the service
+        run: make client &
+    
+      - name: execute the service
+        run: make serve &
+
+      - name: sleep to allow integration tests pass
+        run: sleep 2
+
+      - name: integration & unit tests
+        run: go test -count=1 -p=1 -tags=integration  -v ./...
