@@ -223,8 +223,11 @@ func (cl *client) Close() error {
 		}
 	}
 
-	if err := cl.rconn.Close(); err != nil {
-		errs = multierr.Append(errs, err)
+	if cl.rconn != nil {
+		err := cl.rconn.Close()
+		if err != nil {
+			errs = multierr.Append(errs, err)
+		}
 	}
 
 	close(cl.done)
