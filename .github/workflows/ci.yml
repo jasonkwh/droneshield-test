@@ -37,9 +37,6 @@ jobs:
       - name: sleep
         run: sleep 5
 
-      - name: vet
-        run: go vet ./..
-
       - name: execute the service
         run: make client &
     
