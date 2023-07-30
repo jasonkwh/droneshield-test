@@ -31,6 +31,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Configure git for private modules
+        run: git config --global url."https://jasonkwh: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@github.com".insteadOf "https://github.com"
+
       - name: start redis
         run: make redis
 
