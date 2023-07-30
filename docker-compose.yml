@@ -4,13 +4,13 @@ networks:
   basic:
 
 services:
-    redis:
-      container_name: redis
-      hostname: redis
-      image: redis:alpine
-      restart: always
-      ports:
-        - 6379:6379
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - 6379:6379
 
-      networks:
-        - basic
+    networks:
+      - basic
