@@ -6,4 +6,7 @@ Redis:
   Endpoints: localhost:6379
   Database: 0
 
-WindSimulation: true
+Client:
+  WindSimulation: true
+  MovementServer:
+    Port: 9000

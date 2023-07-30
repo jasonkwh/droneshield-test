@@ -33,7 +33,7 @@ func NewSocketPublisher(conn *websocket.Conn, rcfg config.RedisConfig, redisPsCh
 		zl: zl,
 	}
 
-	go sp.gratefulCloseListener()
+	go sp.gracefulCloseListener()
 	return sp, nil
 }
 
@@ -74,8 +74,8 @@ func (sp *socketPublisher) Close() error {
 	return nil
 }
 
-// gratefulCloseListener - gratefully close socket publisher if websocket connection is closed
-func (sp *socketPublisher) gratefulCloseListener() {
+// gracefulCloseListener - gracefully close socket publisher if websocket connection is closed
+func (sp *socketPublisher) gracefulCloseListener() {
 	for {
 		_, _, err := sp.conn.Read(context.Background())
 		if err != nil {

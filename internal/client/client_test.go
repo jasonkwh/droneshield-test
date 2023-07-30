@@ -48,7 +48,7 @@ func Test_DroneClient_SendCoordinate(t *testing.T) {
 
 			if len(tt.movements) != 0 {
 				for _, movement := range tt.movements {
-					cl.Movement(movement)
+					cl.setMovement(movement)
 				}
 			}
 
@@ -60,7 +60,7 @@ func Test_DroneClient_SendCoordinate(t *testing.T) {
 			tm.mockRedisConn.EXPECT().Close().Return(nil)
 
 			// start sending coordinate after drone intialized
-			go cl.SendCoordinate()
+			go cl.sendCoordinate()
 
 			// advance the clock to tick
 			runtime.Gosched()
@@ -87,14 +87,13 @@ func newMockClient(ctrl *gomock.Controller) (*client, *testMocks) {
 	cl := client{
 		psChan:      psChan,
 		done:        make(chan struct{}),
-		coordinate:  &model.Coordinate{},
 		msgInterval: 1 * time.Second,
 		rconn:       tm.mockRedisConn,
 		zl:          zl,
 	}
 
-	// take off by default
-	cl.Movement(model.MovementTakeOff)
+	// take off
+	cl.setMovement(model.MovementTakeOff)
 
 	return &cl, &tm
 }

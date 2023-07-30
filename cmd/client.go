@@ -3,6 +3,7 @@ package cmd
 import (
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 
@@ -26,11 +27,16 @@ func client(cmd *cobra.Command, args []string) {
 		log.Fatal("unable to start zap logger")
 	}
 
-	cl, err := droneCl.NewClient(cfg.Redis, cfg.WindSimulation, zl)
+	cl, err := droneCl.NewClient(cfg.Redis, cfg.Client.MovementServer, cfg.Client.WindSimulation, zl)
 	if err != nil {
 		zl.Fatal("failed to initialize drone client", zap.Error(err))
 	}
 	clPool = append(clPool, cl)
+	go func() {
+		if err := cl.Run(); err != nil && err != http.ErrServerClosed {
+			zl.Fatal("drone client movement server failed to serve", zap.Error(err))
+		}
+	}()
 
 	zl.Info("client started")
 
@@ -39,7 +45,7 @@ func client(cmd *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt)
 	<-c
 
-	if err := gratefulClose(clPool); err != nil {
+	if err := gracefulClose(clPool); err != nil {
 		zl.Error("failed to close the server", zap.Error(err))
 	}
 	os.Exit(0)
