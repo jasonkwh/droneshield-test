@@ -6,7 +6,7 @@ require (
 	github.com/benbjohnson/clock v1.1.0
 	github.com/golang/mock v1.4.4
 	github.com/gomodule/redigo v1.8.9
-	github.com/jasonkwh/droneshield-test-upstream v0.0.0-20230730040530-c8fcb3f5e2b1
+	github.com/jasonkwh/droneshield-test-upstream v0.0.0-20230730041325-66faeb21face
 	github.com/onsi/gomega v1.27.10
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
