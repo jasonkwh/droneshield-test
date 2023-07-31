@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/jasonkwh/droneshield-test/internal/ballast"
 	"github.com/jasonkwh/droneshield-test/internal/server"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -24,6 +25,15 @@ func serve(cmd *cobra.Command, args []string) {
 	zl, err := initZapLogger()
 	if err != nil {
 		log.Fatal("unable to start zap logger")
+	}
+
+	// start ballast
+	if cfg.Ballast.Enabled {
+		sz, err := ballast.Create(cfg.Ballast.Size)
+		if err != nil {
+			zl.Warn("ballast", zap.Error(err))
+		}
+		zl.Info("ballast", zap.String("value", cfg.Ballast.Size), zap.Int64("bytes", sz))
 	}
 
 	// start server

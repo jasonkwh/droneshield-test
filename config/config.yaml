@@ -10,3 +10,7 @@ Client:
   WindSimulation: true
   MovementServer:
     Port: 9000
+
+Ballast:
+  Enabled: false
+  Size: "50M"
