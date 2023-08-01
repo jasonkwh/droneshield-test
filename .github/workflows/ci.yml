@@ -40,10 +40,10 @@ jobs:
       - name: sleep
         run: sleep 5
 
-      - name: execute the service
+      - name: execute the client
         run: make client &
     
-      - name: execute the service
+      - name: execute the server
         run: make serve &
 
       - name: sleep to allow integration tests pass
